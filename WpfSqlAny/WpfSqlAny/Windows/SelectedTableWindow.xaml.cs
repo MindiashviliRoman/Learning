@@ -43,10 +43,16 @@ namespace WpfSqlAny.Windows
                 return;
             }
 
+            UpdateQueryResult();
+        }
+
+        private void UpdateQueryResult()
+        {
             var query = QueryText.Text;
             if (_dbAdapter != null)
             {
-                QueryResult.DataContext = _dbAdapter.ReadFromTable(query);
+                QueryResult.ItemsSource = _dbAdapter.ReadFromTable(query).AsDataView();
+                QueryResult.IsReadOnly = true;
             }
         }
         
@@ -57,8 +63,12 @@ namespace WpfSqlAny.Windows
             QueryText.Text = START_QUERY.Replace(START_TABLE_NAME, tableName);
             _dbAdapter = dbAdapter;
             Show();
+            UpdateQueryResult();
         }
-        public bool CheckConnectionErrors()
+
+        #endregion
+
+        private bool CheckConnectionErrors()
         {
             if (_dbAdapter == null)
             {
@@ -73,8 +83,6 @@ namespace WpfSqlAny.Windows
             return true;
         }
 
-        #endregion
-
         private void OnAddData_Click(object sender, RoutedEventArgs e)
         {
             if (_dbAdapter == null)
@@ -88,12 +96,11 @@ namespace WpfSqlAny.Windows
                 return;
             }
 
-            var tableDataWindow = new DataTableWindow();
-            tableDataWindow.Mode = DataTableWindow.DateTableMode.AddData;
+            var tableDataWindow = new DataTableWindow(_dbAdapter, TableName.Text, DataTableWindow.DateTableMode.AddData);
             tableDataWindow.Owner = this;
 
             var fields = _dbAdapter.GetFieldParams(TableName.Text);
-            var dt = SqlFieldProperty.GetDataTable(fields);
+            var dt = SqlFieldProperty.GetDataTable(fields, true);
             for (var i = 0; i < ADD_COUNT_ROW; i++)
             {
                 var rw = dt.NewRow();
@@ -110,15 +117,14 @@ namespace WpfSqlAny.Windows
                 return;
             }
 
-            var tableDataWindow = new DataTableWindow();
-            tableDataWindow.Mode = DataTableWindow.DateTableMode.ChangeData;
+            var tableDataWindow = new DataTableWindow(_dbAdapter, TableName.Text, DataTableWindow.DateTableMode.ChangeData);
 
             tableDataWindow.Owner = this;
             FillData(tableDataWindow.TableData, _dbAdapter.ReadFromTableAll(TableName.Text), true);
             //var fields = _dbAdapter.GetFieldParams(TableName.Text);
             //for(var i = 0; i < fields.Count; i++)
             //{
-            //    if (fields[i].IsKey)
+            //    if (fields[i].IsAutoIncrement)
             //    {
             //        (tableDataWindow.TableData.ed as DataGridTextColumn).IsReadOnly = true;
             //    }
@@ -151,12 +157,15 @@ namespace WpfSqlAny.Windows
         {
             //for (var i = 0; i < dt.Columns.Count; i++)
             //{
-            //    dg.Columns.Add( new DataGridTextColumn { 
-            //        Header = dt.Columns[i].ColumnName, Binding = new Binding($"[{dt.Columns[i].ColumnName}]") });
+            //    dg.Columns.Add(new DataGridTextColumn
+            //    {
+            //        Header = dt.Columns[i].ColumnName,
+            //        Binding = new Binding($"[{dt.Columns[i].ColumnName}]")
+            //    });
 
             //    for (var j = 0; j < dt.Rows.Count; j++)
             //    {
-            //        dg.row
+            //        dg.Columns[0].
             //    }
             //}
 

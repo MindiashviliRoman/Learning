@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using WpfSqlAny.Logic.SupportTypes;
 
@@ -171,7 +172,6 @@ namespace WpfSqlAny.Logic
             return ReadFromTable($"SELECT * FROM {tableName}");
         }
 
-
         public List<SqlFieldProperty> GetFieldParams(string tableName)
         {
             List<SqlFieldProperty> result = new List<SqlFieldProperty>();
@@ -179,34 +179,39 @@ namespace WpfSqlAny.Logic
             {
                 cmdSQL.CommandText = "SELECT * FROM " + tableName;
                 SQLiteDataReader dr = cmdSQL.ExecuteReader();
-                var schmTbl = dr.GetSchemaTable();
 
-                //Getting primaryKey name of column
-                string primaryKeyName = "";
-                bool flgPrimKeyExists = false;
-                var primKeys = (
-                    from T in schmTbl.AsEnumerable()
-                    where T.Field<bool>("IsKey")
-                    select T.Field<string>("ColumnName")).ToArray();
-                if (primKeys.Length > 0)
+                using (var schemaTable = dr.GetSchemaTable())
                 {
-                    primaryKeyName = primKeys[0];
-                    flgPrimKeyExists = true;
+                    for (var i = 0; i < schemaTable.Rows.Count; i++)
+                    {
+                        var row = schemaTable.Rows[i];
+
+                        var columnName = row.Field<string>("ColumnName");
+                        var dataTypeName = row.Field<string>("DataTypeName");
+                        var isAutoIncreent = row.Field<bool>("IsAutoIncrement");
+
+                        //var numericPrecision = row.Field<int>("NumericPrecision");
+                        //var numericScale = row.Field<int>("NumericScale");
+                        //var columnSize = row.Field<int>("ColumnSize");
+                        //var isKey = row.Field<bool>("IsKey");
+                        //var isUnique = row.Field<bool>("IsUnique");
+                        //var allowDBNull = row.Field<bool>("AllowDBNull");
+                        //var isLong = row.Field<bool>("IsLong");
+                        //var isReadOnly = row.Field<bool>("IsReadOnly");
+                        //var isRowVersion = row.Field<bool>("IsRowVersion");
+                        //var providerType = row.Field<int>("ProviderType");
+
+                        var curParams = new SqlFieldProperty();
+                        curParams.Name = columnName;
+                        curParams.Type = SqlDataType.GetTypeFromName(dr.GetDataTypeName(i));//dr.GetFieldType(i).ToString();
+                        curParams.IsAutoIncrement = isAutoIncreent;
+
+                        result.Add(curParams);
+                    }
                 }
 
-                //Getting Fields params
-                for (var i = 0; i < dr.FieldCount; i++)
-                {
-                    var curParams = new SqlFieldProperty();
-                    curParams.Name = dr.GetName(i);
-                    curParams.Type = SqlDataType.GetTypeFromName(dr.GetDataTypeName(i));//dr.GetFieldType(i).ToString();
-                    curParams.IsKey = flgPrimKeyExists && curParams.Name == primaryKeyName;
-
-                    result.Add(curParams);
-                }
                 dr.Close();
             }
-
 
             return result;
         }
@@ -330,7 +335,7 @@ namespace WpfSqlAny.Logic
             _dbCommand.CommandText = "CREATE TABLE IF NOT EXISTS " + resultName;// + " (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, book TEXT, comment TEXT)";
             if (paramsOfTable.Count > 0)
             {
-                if (paramsOfTable[0].IsKey)
+                if (paramsOfTable[0].IsAutoIncrement)
                 {
                     _dbCommand.CommandText += " (" + paramsOfTable[0].Name + " " + paramsOfTable[0].Type + " PRIMARY KEY AUTOINCREMENT";
                 }
@@ -340,7 +345,7 @@ namespace WpfSqlAny.Logic
                 }
                 for (int i = 1; i < paramsOfTable.Count; i++)
                 {
-                    if (paramsOfTable[i].IsKey)
+                    if (paramsOfTable[i].IsAutoIncrement)
                     {
                         _dbCommand.CommandText += ", " + paramsOfTable[i].Name + " " + paramsOfTable[i].Type + " PRIMARY KEY AUTOINCREMENT";
                     }

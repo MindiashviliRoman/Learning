@@ -6,23 +6,26 @@ namespace WpfSqlAny.Logic.SupportTypes
 {
     public struct SqlFieldProperty
     {
-        public bool IsKey;
+        public bool IsAutoIncrement;
         public string Name;
         public SqlDataType Type;
 
         public SqlFieldProperty(bool isKey, string name, SqlDataType type)
         {
-            IsKey = isKey;
+            IsAutoIncrement = isKey;
             Name = name;
             Type = type;
         }
 
-        public static DataTable GetDataTable(List<SqlFieldProperty> fields)
+        public static DataTable GetDataTable(List<SqlFieldProperty> fields, bool exceptAutoIncrement)
         {
             var dt = new DataTable();
             foreach (var field in fields)
             {
-                dt.Columns.Add(field.Name);
+                if(exceptAutoIncrement && !field.IsAutoIncrement)
+                {
+                    dt.Columns.Add(field.Name);
+                }
             }
             return dt;
         }

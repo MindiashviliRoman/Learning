@@ -8,8 +8,7 @@ namespace WpfSqlAny.Logic
 {
     public enum ConnectionStatusType
     {
-        Connected,
         Disconnected,
-
+        Connected,
     }
 }

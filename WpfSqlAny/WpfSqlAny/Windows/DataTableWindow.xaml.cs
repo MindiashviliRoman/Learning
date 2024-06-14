@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlTypes;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,7 +22,7 @@ namespace WpfSqlAny.Windows
     /// <summary>
     /// Interaction logic for DataTableWindow.xaml
     /// </summary>
-    public partial class DataTableWindow : Window, IRequestToTables
+    public partial class DataTableWindow : Window
     {
         public enum DateTableMode
         {
@@ -26,19 +30,21 @@ namespace WpfSqlAny.Windows
             ChangeData
         }
 
-        public DateTableMode Mode;
+        public DateTableMode Mode { get; }
         private IDbAdapter _dbAdapter;
-        public DataTableWindow()
+        private string _tableName;
+        private DataTableWindow()
         {
             InitializeComponent();
         }
 
-        #region IRequestAnswer
-        public void ShowWithUpdateInfo(IDbAdapter dbAdapter, string tableName)
+        public DataTableWindow(IDbAdapter dbAdapter, string tableName, DateTableMode mode)
         {
-            Title = tableName + $" in mode: {Mode}";
+            InitializeComponent();
             _dbAdapter = dbAdapter;
-            ShowDialog();
+            Mode = mode;
+            Title = tableName + $" in mode: {Mode}";
+            _tableName = tableName;
         }
 
         public bool CheckConnectionErrors()
@@ -48,20 +54,12 @@ namespace WpfSqlAny.Windows
                 App.ErrorMessage("Not found link to dbAdapter");
                 return false;
             }
-            if (_dbAdapter.CurrentStatus == ConnectionStatusType.Disconnected)
+            if (_dbAdapter.CurrentStatus != ConnectionStatusType.Connected)
             {
                 App.ErrorMessage("db not conneted");
                 return false;
             }
             return true;
-        }
-
-        #endregion
-
-        public void Init(IDbAdapter dbAdapter, DateTableMode mode)
-        {
-            _dbAdapter = dbAdapter;
-            Mode = mode;
         }
 
         private void Accept_OnClick(object sender, RoutedEventArgs e)
@@ -73,12 +71,47 @@ namespace WpfSqlAny.Windows
             switch(Mode)
             {
                 case DateTableMode.AddData:
-                    //_dbAdapter.SaveDataToDB();
+                    _dbAdapter.SaveDataToDB(GetDataTable(TableData), _tableName);
                     break;
                 case DateTableMode.ChangeData:
 
                     break;
             }
+        }
+
+        private DataTable GetDataTable(DataGrid dg)
+        {
+            var dataTable = new DataTable();
+            foreach (var item in dg.ItemsSource)
+            {
+                var table = (item as DataRowView).Row.Table;
+                foreach (var column in table.Columns)
+                {
+                    dataTable.Columns.Add(column.ToString());
+                }
+                break;
+            }
+
+            foreach (var item in dg.ItemsSource)
+            {
+                var row = (item as DataRowView).Row;
+                foreach (var cell in row.ItemArray)
+                {
+                    if (!string.IsNullOrEmpty(cell.ToString()))
+                    {
+                        dataTable.Rows.Add(row.ItemArray);
+                        break;
+                    }
+                    //var count = row.ItemArray.Length;
+                    //var values = new object[count];
+                    //for (int i = 0; i < count; i++)
+                    //{
+                    //    values[i] = row.ItemArray[i];
+                    //}
+                }
+            }
+
+            return dataTable;
         }
     }
 }

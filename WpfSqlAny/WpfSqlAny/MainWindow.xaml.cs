@@ -290,7 +290,7 @@ namespace WpfSqlAny
         //        bool flgPrimKeyExists = false;
         //        var primKeys = (
         //            from T in schmTbl.AsEnumerable()
-        //            where T.Field<bool>("IsKey")
+        //            where T.Field<bool>("IsAutoIncrement")
         //            select T.Field<string>("ColumnName")).ToArray();
         //        if (primKeys.Length > 0)
         //        {
