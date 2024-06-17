@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Windows;
 using WpfSqlAny.Logic.SupportTypes;
 
@@ -142,6 +140,129 @@ namespace WpfSqlAny.Logic
             }
         }
 
+        public void DeleteColumn(string tName, string colName)
+        {
+            try
+            {
+                List<SqlFieldProperty> fieldParams = GetFieldParams(tName);
+                if (fieldParams != null)
+                {
+                    bool isColNameExist = false;
+                    for (int i = 0; i < fieldParams.Count; i++)
+                    {
+                        if (fieldParams[i].Name == colName)
+                        {
+                            fieldParams.RemoveAt(i);
+                            isColNameExist = true;
+                            break;
+                        }
+                    }
+                    if (isColNameExist)
+                    {
+                        string dublTabName = CreateDublOfTableByFields(tName, fieldParams);
+
+                        //Copy info from old Table to new
+                        string s1 = "INSERT INTO " + dublTabName + "(" + fieldParams[0].Name;
+                        string s2 = " SELECT " + fieldParams[0].Name;
+
+                        for (int i = 1; i < fieldParams.Count; i++)
+                        {// to last element
+                            //_dbCommand.CommandText = "INSERT INTO " + dublTabName + "("+ fieldParams[i].Name +")" + " SELECT " + fieldParams[i].Name +" FROM " + tName;
+                            s1 += ", " + fieldParams[i].Name;
+                            s2 += ", " + fieldParams[i].Name;
+                        }
+                        _dbCommand.CommandText = s1 + ")" + s2 + " FROM " + tName;
+                        _dbCommand.ExecuteNonQuery();
+
+                        _dbCommand.CommandText = "DROP TABLE " + tName;
+                        _dbCommand.ExecuteNonQuery();
+                        //                _dbCommand.CommandText = "PRAGMA legacy_alter_table=OFF";
+                        //                _dbCommand.ExecuteNonQuery();
+
+                        _dbCommand.CommandText = "ALTER TABLE " + dublTabName + " RENAME TO " + tName;
+                        _dbCommand.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Table not compaund column with name " + "\"" + colName + "\"");
+                    }
+                }
+
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        public void DeleteTable(string tName)
+        {
+            try
+            {
+                _dbCommand.CommandText = "DROP TABLE " + tName;
+                _dbCommand.ExecuteNonQuery();
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        public void ClearTable(string tName)
+        {
+            try
+            {
+                _dbCommand.CommandText = "DELETE FROM " + tName;
+                _dbCommand.ExecuteNonQuery();
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        public void SaveDataToDB(DataTable data, string tableName)
+        {
+            try
+            {
+                int colCnt = data.Columns.Count;
+
+                if (colCnt > 0)
+                {
+                    _dbCommand.CommandText = "INSERT INTO " + tableName + " (" + "'" + data.Columns[0].ColumnName + "'";
+                    for (int i = 1; i < colCnt; i++)
+                    {
+                        _dbCommand.CommandText += ", '" + data.Columns[i].ColumnName + "'";
+                    }
+                    _dbCommand.CommandText += ") VALUES";
+                    //sqlCmd.CommandText = "INSERT INTO " + tabName + " ('author', 'book') VALUES";
+                    if (data.Rows.Count > 0)
+                    {
+                        _dbCommand.CommandText += "('" + data.Rows[0][0];
+                        for (int j = 1; j < colCnt; j++)
+                        {
+                            _dbCommand.CommandText += "' , '" + data.Rows[0][j];
+                        }
+                        _dbCommand.CommandText += "')";
+
+                        for (int i = 1; i < data.Rows.Count; i++)
+                        {
+                            _dbCommand.CommandText += ", ('";
+                            for (int j = 1; j < colCnt; j++)
+                            {
+                                _dbCommand.CommandText += "' , '" + data.Rows[i][j];
+                            }
+                            _dbCommand.CommandText += "')";
+                        }
+                        _dbCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
 
         public DataTable ReadFromTable(string query)
         {
@@ -214,49 +335,6 @@ namespace WpfSqlAny.Logic
             }
 
             return result;
-        }
-
-        public void SaveDataToDB(DataTable data, string tableName)
-        {
-            try
-            {
-                int colCnt = data.Columns.Count;
-
-                if (colCnt > 0)
-                {
-                    _dbCommand.CommandText = "INSERT INTO " + tableName + " (" + "'" + data.Columns[0].ColumnName + "'";
-                    for (int i = 1; i < colCnt; i++)
-                    {
-                        _dbCommand.CommandText += ", '" + data.Columns[i].ColumnName + "'";
-                    }
-                    _dbCommand.CommandText += ") VALUES";
-                    //sqlCmd.CommandText = "INSERT INTO " + tabName + " ('author', 'book') VALUES";
-                    if (data.Rows.Count > 0)
-                    {
-                        _dbCommand.CommandText += "('" + data.Rows[0][0];
-                        for (int j = 1; j < colCnt; j++)
-                        {
-                            _dbCommand.CommandText += "' , '" + data.Rows[0][j];
-                        }
-                        _dbCommand.CommandText += "')";
-
-                        for (int i = 1; i < data.Rows.Count; i++)
-                        {
-                            _dbCommand.CommandText += ", ('";
-                            for (int j = 1; j < colCnt; j++)
-                            {
-                                _dbCommand.CommandText += "' , '" + data.Rows[i][j];
-                            }
-                            _dbCommand.CommandText += "')";
-                        }
-                        _dbCommand.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (SQLiteException ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
         }
         #endregion
 

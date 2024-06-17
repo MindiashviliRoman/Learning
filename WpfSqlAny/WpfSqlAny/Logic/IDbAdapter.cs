@@ -17,11 +17,17 @@ namespace WpfSqlAny.Logic
         void ConnectToDB();
         void AddColumn(string tableName, string columnName, SqlDataType columnType);
 
+        void DeleteColumn(string tName, string colName);
+
+        void DeleteTable(string tName);
+
+        void ClearTable(string tName);
+
+        void SaveDataToDB(DataTable data, string tableName);
+
         DataTable GetTablesNames();
         DataTable ReadFromTable(string query);
         DataTable ReadFromTableAll(string tableName);
         List<SqlFieldProperty> GetFieldParams(string tableName);
-
-        void SaveDataToDB(DataTable data, string tableName);
     }
 }

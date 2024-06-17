@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,6 +27,14 @@ namespace WpfSqlAny
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region SupportClass
+        private class TablesProperies
+        {
+            public string Name { get; set; }
+        }
+
+        #endregion
+
         private IDbAdapter _adapter;
 
         public MainWindow()
@@ -31,7 +42,7 @@ namespace WpfSqlAny
             InitializeComponent();
 
             //Subscribing as example from C# code. But it can be added from xaml
-            (this.toolBarGrid.Children[0] as Button).Click += Create_Click;
+            (this.toolBarGrid.Children[0] as Button).Click += CreateTable_Click;
             (this.toolBarGrid.Children[1] as Button).Click += Connect_Click;
 
             tabl.MouseDoubleClick += CatalogsRow_MouseDoubleClick;
@@ -47,26 +58,115 @@ namespace WpfSqlAny
             ChangeStatusField(ConnectionStatusType.Disconnected);
 
             _adapter.StatusChanged += ChangeStatusField;
-            //_adapter.DataUpdated += UpdatedData;
+
             RefreshCatalogsFromDB(_adapter.GetTablesNames());
         }
 
         private void RefreshCatalogsFromDB(DataTable dt)
         {
-            tabl.ItemsSource = dt.AsDataView();
+            var dtView = dt.AsDataView();
+            //tabl.ItemsSource = dtView;
+            tabl.Items.Clear();
+            tabl.Columns.Clear();
             tabl.IsReadOnly = true;
+
+            var dataGridTemplate = new DataGridTemplateColumn();
+            var factory = new FrameworkElementFactory(typeof(Button));
+            factory.SetValue(Button.ContentProperty, "Delete Table");
+            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((o, e) => OnDeleteTable(o, e)));
+            var cellTemplate = new DataTemplate();
+            cellTemplate.VisualTree = factory;
+            dataGridTemplate.Header = "action";
+            dataGridTemplate.CellTemplate = cellTemplate;
+
+            var fieldNames = new string[dt.Columns.Count];
+            for (var i = 0; i < dt.Columns.Count; i++)
+            {
+                var columnHeader = dt.Columns[i].ToString();
+                Binding bind = new Binding("Name");
+                bind.Mode = BindingMode.OneWay;
+                //for (var j = 0; j < dtView.Count; j++)
+                //{
+                //    var rowView = dtView[j];
+                //    var row = rowView.Row;
+                //    tabl.Items.Add(row.ItemArray);
+                //    bind.Source = row[dt.Columns[i]];
+                //}
+
+                var dgt = new DataGridTemplateColumn();
+                var fef = new FrameworkElementFactory(typeof(TextBlock));
+                fef.SetBinding(TextBlock.TextProperty, bind);
+
+
+                dgt.Header = columnHeader;
+
+                var dTemplate = new DataTemplate();
+                
+                dTemplate.VisualTree = fef;
+                dgt.CellTemplate = dTemplate;
+                tabl.Columns.Add(dgt);
+                fieldNames[i] = dgt.Header.ToString();
+            }
+
+            List<object> items = new List<object>();
+            for (var i = 0; i < dtView.Count; i++)
+            {
+                var rowView = dtView[i];
+                var row = rowView.Row;
+
+                var varObj = App.CreateTypeWithRandomStringFields(row.ItemArray, fieldNames);
+                items.Add(varObj);
+                //var vr = new { name = row.ItemArray[0], rootpage = row.ItemArray[2], sql = row.ItemArray[1] };
+                //tabl.Items.Add(vr);
+                //tabl.Items.Add(varObj);
+
+                //tabl.Items.Add(new
+                //{
+                //    @type = row.ItemArray[0],
+                //    name = row.ItemArray[1],
+                //    tblname = row.ItemArray[2],
+                //    rootpage = row.ItemArray[3],
+                //    sql = row.ItemArray[4]
+                //});
+                tabl.Items.Add(new TablesProperies { Name = row.ItemArray[0].ToString() });
+                //tabl.Items.Add(row.ItemArray[0]);
+            }
+            //tabl.ItemsSource = items;
+            tabl.Columns.Add(dataGridTemplate);
+        }
+
+        private void OnDeleteTable(object sender, RoutedEventArgs e)
+        {
+            if (!CheckConnectionErrors())
+            {
+                return;
+            }
+
+            var btn = (Button)sender;
+
+            var cell = ItemsControl.ContainerFromElement((DataGrid)btn.Parent,
+                        e.OriginalSource as DependencyObject) as DataGridCell;
+
+            //int rowIndex = tabl.Items.IndexOf(tabl.CurrentItem);
+            var tableName = (cell.DataContext as TablesProperies).Name;//((DataRowView)row.Item)[0].ToString();
+            _adapter.DeleteTable(tableName);
+            RefreshCatalogsFromDB(_adapter.GetTablesNames());
         }
 
         private void CatalogsRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (!CheckConnectionErrors())
+            {
+                return;
+            }
+
             var row = ItemsControl.ContainerFromElement((DataGrid)sender,
                                     e.OriginalSource as DependencyObject) as DataGridRow;
 
             if (row == null) return;
 
-            //var index = row.GetIndex();
             var selectedTableWindow = new SelectedTableWindow();
-            selectedTableWindow.ShowWithUpdateInfo(_adapter, ((DataRowView)row.Item)[0].ToString());
+            selectedTableWindow.ShowWithUpdateInfo(_adapter, (row.Item as TablesProperies).Name);
         }
 
         private void ChangeStatusField(ConnectionStatusType statusType)
@@ -74,7 +174,7 @@ namespace WpfSqlAny
             status.Text = statusType.ToString();
         }
 
-        private void Create_Click(object sender, RoutedEventArgs e)
+        private void CreateTable_Click(object sender, RoutedEventArgs e)
         {
             if(_adapter == null)
             {
@@ -82,15 +182,14 @@ namespace WpfSqlAny
                 return;
             }
 
-            var createTavleWindow = new CreatingTableWindow();
-            createTavleWindow.ShowWithCallback(CreateTableWithName);
+            var createTableWindow = new CreatingTableWindow();
+            createTableWindow.ShowWithCallback(CreateTableWithName);
         }
 
         private void CreateTableWithName(string name)
         {
-            if (_adapter == null)
+            if (!CheckConnectionErrors())
             {
-                App.ErrorMessage("Not exist adapter instance");
                 return;
             }
             _adapter.CreateTable(name);
@@ -107,213 +206,24 @@ namespace WpfSqlAny
             _adapter.ConnectToDB();
         }
 
-        private void ReadFromTable_Click(object sender, RoutedEventArgs e)
+        private bool CheckConnectionErrors()
         {
-
-        }
-
-        private void DeleteColumn_Click(object sender, RoutedEventArgs e)
-        {
-            //if (dbConn.State != ConnectionState.Open)
-            //{
-            //    MessageBox.Show("Open connection with database");
-            //    return;
-            //}
-
-            //DeleteColumn(tabName, textBoxColumnName.Text);
-            //ReadFromTable(tabName);
-        }
-
-        private void UpdatedData(DataTable data)
-        {
-            tabl.ItemsSource = null;
-            tabl.IsReadOnly = false;
-            if (data.Rows.Count == 0)
+            if (_adapter == null)
             {
-                tabl.ItemsSource = data.AsDataView();
-                tabl.IsReadOnly = true;
+                App.ErrorMessage("Not found link to dbAdapter");
+                return false;
             }
-            else
-                App.ErrorMessage("Database is empty");
+            if (_adapter.CurrentStatus == ConnectionStatusType.Disconnected)
+            {
+                App.ErrorMessage("db not conneted");
+                return false;
+            }
+            return true;
         }
 
-        //private void CreateTable(object sender, RoutedEventArgs e)
-        //{
-        //    if (dbConn.State != ConnectionState.Open)
-        //    {
-        //        MessageBox.Show("Open connection with database");
-        //        return;
-        //    }
-        //    AddToDBWindow toDBWindow = new AddToDBWindow();
-        //    toDBWindow.Show();
+        private void OnDeleteTable_Click(object sender, RoutedEventArgs e)
+        {
 
-        //}
-
-
-
-
-
-
-        //private void ClearTable(string tName)
-        //{
-        //    try
-        //    {
-        //        sqlCmd.CommandText = "DELETE FROM " + tName;
-        //        sqlCmd.ExecuteNonQuery();
-        //    }
-        //    catch (SQLiteException ex)
-        //    {
-        //        MessageBox.Show("Error: " + ex.Message);
-        //    }
-        //}
-
-        //private void DeleteTable(string tName)
-        //{
-        //    try
-        //    {
-        //        sqlCmd.CommandText = "DROP TABLE " + tName;
-        //        sqlCmd.ExecuteNonQuery();
-        //    }
-        //    catch (SQLiteException ex)
-        //    {
-        //        MessageBox.Show("Error: " + ex.Message);
-        //    }
-        //}
-
-        //private void DeleteColumn(string tName, string colName, string sTypeCol = "TEXT")
-        //{
-        //    try
-        //    {
-        //        List<FieldParam> fieldParams = GetFieldParams(dbConn, tName);
-        //        if (fieldParams != null)
-        //        {
-        //            bool isColNameExist = false;
-        //            for (int i = 0; i < fieldParams.Count; i++)
-        //            {
-        //                if (fieldParams[i].Name == colName)
-        //                {
-        //                    fieldParams.RemoveAt(i);
-        //                    isColNameExist = true;
-        //                    break;
-        //                }
-        //            }
-        //            if (isColNameExist)
-        //            {
-        //                string dublTabName = CreateDublOfTableByFields(tName, fieldParams);
-
-        //                //Copy info from old Table to new
-        //                string s1 = "INSERT INTO " + dublTabName + "(" + fieldParams[0].Name;
-        //                string s2 = " SELECT " + fieldParams[0].Name;
-
-        //                for (int i = 1; i < fieldParams.Count; i++)
-        //                {// to last element
-        //                    //sqlCmd.CommandText = "INSERT INTO " + dublTabName + "("+ fieldParams[i].Name +")" + " SELECT " + fieldParams[i].Name +" FROM " + tName;
-        //                    s1 += ", " + fieldParams[i].Name;
-        //                    s2 += ", " + fieldParams[i].Name;
-        //                }
-        //                sqlCmd.CommandText = s1 + ")" + s2 + " FROM " + tName;
-        //                sqlCmd.ExecuteNonQuery();
-
-        //                sqlCmd.CommandText = "DROP TABLE " + tName;
-        //                sqlCmd.ExecuteNonQuery();
-        //                //                sqlCmd.CommandText = "PRAGMA legacy_alter_table=OFF";
-        //                //                sqlCmd.ExecuteNonQuery();
-
-        //                sqlCmd.CommandText = "ALTER TABLE " + dublTabName + " RENAME TO " + tName;
-        //                sqlCmd.ExecuteNonQuery();
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show("Table not compaund column with name " + "\"" + colName + "\"");
-        //            }
-        //        }
-
-        //    }
-        //    catch (SQLiteException ex)
-        //    {
-        //        MessageBox.Show("Error: " + ex.Message);
-        //    }
-        //}
-
-
-
-        //private string CreateDublOfTableByFields(string tName, List<FieldParam> paramsOfTable)
-        //{
-        //    string resultName = "Tmp_" + tName;
-        //    sqlCmd.CommandText = "CREATE TABLE IF NOT EXISTS " + resultName;// + " (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, book TEXT, comment TEXT)";
-        //    if (paramsOfTable.Count > 0)
-        //    {
-        //        if (paramsOfTable[0].IsPrimaryKey)
-        //        {
-        //            sqlCmd.CommandText += " (" + paramsOfTable[0].Name + " " + paramsOfTable[0].DType + " PRIMARY KEY AUTOINCREMENT";
-        //        }
-        //        else
-        //        {
-        //            sqlCmd.CommandText += " (" + paramsOfTable[0].Name + " " + paramsOfTable[0].DType;
-        //        }
-        //        for (int i = 1; i < paramsOfTable.Count; i++)
-        //        {
-        //            if (paramsOfTable[i].IsPrimaryKey)
-        //            {
-        //                sqlCmd.CommandText += ", " + paramsOfTable[i].Name + " " + paramsOfTable[i].DType + " PRIMARY KEY AUTOINCREMENT";
-        //            }
-        //            else
-        //            {
-        //                sqlCmd.CommandText += ", " + paramsOfTable[i].Name + " " + paramsOfTable[i].DType;
-        //            }
-        //        }
-        //        sqlCmd.CommandText += ")";
-        //    }
-        //    sqlCmd.ExecuteNonQuery();
-        //    return resultName;
-        //}
-
-        //public List<FieldParam> GetFieldParams(SQLiteConnection conn, string tName = "")
-        //{
-        //    if (conn == null)
-        //    {
-        //        conn = dbConn;
-        //    }
-        //    if (tName == "")
-        //    {
-        //        tName = tabName;
-        //    }
-        //    List<FieldParam> result = new List<FieldParam>();
-        //    using (SQLiteCommand cmdSQL = dbConn.CreateCommand())
-        //    {
-        //        cmdSQL.CommandText = "select * from " + tName;
-        //        SQLiteDataReader dr = cmdSQL.ExecuteReader();
-        //        var schmTbl = dr.GetSchemaTable();
-
-        //        //Getting primaryKey name of column
-        //        string primaryKeyName = "";
-        //        bool flgPrimKeyExists = false;
-        //        var primKeys = (
-        //            from T in schmTbl.AsEnumerable()
-        //            where T.Field<bool>("IsAutoIncrement")
-        //            select T.Field<string>("ColumnName")).ToArray();
-        //        if (primKeys.Length > 0)
-        //        {
-        //            primaryKeyName = primKeys[0];
-        //            flgPrimKeyExists = true;
-        //        }
-
-        //        //Getting Fields params
-        //        for (var i = 0; i < dr.FieldCount; i++)
-        //        {
-        //            FieldParam curParams = new FieldParam();
-        //            curParams.Name = dr.GetName(i);
-        //            curParams.DType = dr.GetDataTypeName(i);//dr.GetFieldType(i).ToString();
-        //            curParams.IsPrimaryKey = flgPrimKeyExists && curParams.Name == primaryKeyName;
-
-        //            result.CreateTable(curParams);
-        //        }
-        //        dr.Close();
-        //    }
-
-
-        //    return result;
-        //}
-
+        }
     }
 }

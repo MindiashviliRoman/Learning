@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 using System.Windows;
 using WpfSqlAny.Logic;
@@ -45,6 +47,32 @@ namespace WpfSqlAny
                 result.Add(row[nNameColumn].ToString());
             }
             return result;
+        }
+
+        public static object CreateTypeWithRandomStringFields(object[] fields, string[] names)
+        {
+            // Let's start by creating a new assembly
+            AssemblyName dynamicAssemblyName = new AssemblyName("SupportAssemply");
+            AssemblyBuilder dynamicAssembly = AssemblyBuilder.DefineDynamicAssembly(dynamicAssemblyName, AssemblyBuilderAccess.Run);
+            ModuleBuilder dynamicModule = dynamicAssembly.DefineDynamicModule("SupportAssemply");
+
+            // Now let's build a new type
+            TypeBuilder dynamicAnonymousType = dynamicModule.DefineType("MyAnon", TypeAttributes.Public);
+
+            for (var i = 0; i < fields.Length; i++)
+            {
+                var field = dynamicAnonymousType.DefineField(names[i], typeof(string), FieldAttributes.Public);
+            }
+            // Return the type to the caller
+            var type = dynamicAnonymousType.CreateType();
+
+            dynamic myVar = Activator.CreateInstance(type);
+            var myFields = myVar.GetType().GetFields();
+            for (var i = 0; i < myFields.Length; i++)
+            {
+                myFields[i].SetValue(myVar, fields[i].ToString()); 
+            }
+            return myVar;
         }
     }
 }

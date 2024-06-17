@@ -142,6 +142,7 @@ namespace WpfSqlAny.Windows
             if (!string.IsNullOrEmpty(ColumnNameBlock.Text))
             {
                 _dbAdapter.AddColumn(TableName.Text, ColumnNameBlock.Text, new SqlDataType());
+                UpdateQueryResult();
             }
         }
 
@@ -151,6 +152,8 @@ namespace WpfSqlAny.Windows
             {
                 return;
             }
+            _dbAdapter.DeleteColumn(TableName.Text, ColumnNameBlock.Text);
+            UpdateQueryResult();
         }
 
         private void FillData(DataGrid dg, DataTable dt, bool readOnly)
