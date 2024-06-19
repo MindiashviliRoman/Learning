@@ -23,9 +23,11 @@ namespace WpfSqlAny.Logic
 
         public void Init(string dbName)
         {
-            _dbConnection = new SQLiteConnection();
-            _dbCommand = new SQLiteCommand();
             _dbPath = dbName;
+
+            _dbConnection = new SQLiteConnection("Data Source=" + _dbPath + ";Version=3;");
+            _dbConnection.Open();
+            _dbCommand = new SQLiteCommand();
 
             if (!File.Exists(_dbPath))
                 SQLiteConnection.CreateFile(_dbPath);
@@ -45,11 +47,11 @@ namespace WpfSqlAny.Logic
             }
             try
             {
-                _dbConnection = new SQLiteConnection("Data Source=" + _dbPath + ";Version=3;");
-                _dbConnection.Open();
+                //_dbConnection = new SQLiteConnection("Data Source=" + _dbPath + ";Version=3;");
+                //_dbConnection.Open();
                 _dbCommand.Connection = _dbConnection;
 
-                _dbCommand.CommandText = "CREATE TABLE IF NOT EXISTS " + name + " (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, book TEXT, comment TEXT)";
+                _dbCommand.CommandText = "CREATE TABLE IF NOT EXISTS " + name + " (id INTEGER PRIMARY KEY AUTOINCREMENT)";
                 _dbCommand.ExecuteNonQuery();
 
                 CurrentStatus = ConnectionStatusType.Connected;
@@ -68,8 +70,8 @@ namespace WpfSqlAny.Logic
             DataTable dt = new DataTable();
             try
             {
-                _dbConnection = new SQLiteConnection("Data Source=" + _dbPath + ";Version=3;");
-                _dbConnection.Open();
+                //_dbConnection = new SQLiteConnection("Data Source=" + _dbPath + ";Version=3;");
+                //_dbConnection.Open();
                 var query = "SELECT name FROM sqlite_master " +
                        "WHERE type = 'table'";// +
                        //" ORDER BY 1";
@@ -274,13 +276,21 @@ namespace WpfSqlAny.Logic
                 return null;
             }
 
+            //using (SQLiteCommand cmd = new SQLiteCommand(query, _dbConnection))
+            //{
+            //    using (SQLiteDataReader rdr = cmd.ExecuteReader())
+            //    {
+            //        dTable.Load(rdr);
+            //    }
+            //}
+
             try
             {
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, _dbConnection);
                 adapter.Fill(dTable);
                 DataUpdated?.Invoke(dTable);
             }
-            catch (SQLiteException ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message);
             }
@@ -347,8 +357,8 @@ namespace WpfSqlAny.Logic
 
             try
             {
-                _dbConnection = new SQLiteConnection("Data Source=" + _dbPath + ";Version=3;");
-                _dbConnection.Open();
+                //_dbConnection = new SQLiteConnection("Data Source=" + _dbPath + ";Version=3;");
+                //_dbConnection.Open();
                 _dbCommand.Connection = _dbConnection;
 
                 CurrentStatus = ConnectionStatusType.Connected;

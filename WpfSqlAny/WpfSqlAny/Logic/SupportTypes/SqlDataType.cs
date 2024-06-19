@@ -24,6 +24,21 @@ namespace WpfSqlAny.Logic.SupportTypes
 
         private static readonly string[] dataTypeNames;
         private static readonly DataType[] dataTypeValues;
+
+        private static readonly Dictionary<DataType, Type> _dataTypeMap =
+            new Dictionary<DataType, Type>() { 
+                { DataType.VARCHAR, typeof(string) },
+                { DataType.TEXT, typeof(string) },
+                { DataType.INTEGER, typeof(Int64) },
+                { DataType.DESIMAL, typeof(decimal) },
+                { DataType.Not_Valid, typeof(object) },
+            };
+
+        public static string[] GetDataTypes()
+        {
+            return dataTypeNames;
+        }
+
         static SqlDataType()
         {
             var dtType = typeof(DataType);
@@ -62,6 +77,11 @@ namespace WpfSqlAny.Logic.SupportTypes
                     return $"{DType}({Optional[0]})";
             }
             return DType.ToString();
+        }
+
+        public Type GetMappedType()
+        {
+            return _dataTypeMap[DType];
         }
 
         public static SqlDataType GetTypeFromName(string name)

@@ -58,8 +58,6 @@ namespace WpfSqlAny
             ChangeStatusField(ConnectionStatusType.Disconnected);
 
             _adapter.StatusChanged += ChangeStatusField;
-
-            RefreshCatalogsFromDB(_adapter.GetTablesNames());
         }
 
         private void RefreshCatalogsFromDB(DataTable dt)
@@ -204,6 +202,8 @@ namespace WpfSqlAny
                 return;
             }
             _adapter.ConnectToDB();
+
+            RefreshCatalogsFromDB(_adapter.GetTablesNames());
         }
 
         private bool CheckConnectionErrors()

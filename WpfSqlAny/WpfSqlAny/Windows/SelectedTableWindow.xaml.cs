@@ -24,22 +24,27 @@ namespace WpfSqlAny.Windows
 
         const string START_TABLE_NAME = "tableName";
         const string START_QUERY = "SELECT * FROM tableName";
-        const int ADD_COUNT_ROW = 10;
+
         public SelectedTableWindow()
         {
             InitializeComponent();
+            FillTypesCombobox();
+        }
+
+        private void FillTypesCombobox()
+        {
+            var typeNames = SqlDataType.GetDataTypes();
+            foreach(var name in typeNames)
+            {
+                ColumnTypeComboBox.Items.Add(name);
+            }
+            ColumnTypeComboBox.SelectedIndex = 0;
         }
 
         private void OnAccept_Click(object sender, RoutedEventArgs e)
         {
-            if (_dbAdapter == null)
+            if (!CheckConnectionErrors())
             {
-                App.ErrorMessage("Not found link to dbAdapter");
-                return;
-            }
-            if (_dbAdapter.CurrentStatus == ConnectionStatusType.Disconnected)
-            {
-                App.ErrorMessage("db not conneted");
                 return;
             }
 
@@ -63,7 +68,7 @@ namespace WpfSqlAny.Windows
             QueryText.Text = START_QUERY.Replace(START_TABLE_NAME, tableName);
             _dbAdapter = dbAdapter;
             Show();
-            UpdateQueryResult();
+            //UpdateQueryResult();
         }
 
         #endregion
@@ -85,28 +90,17 @@ namespace WpfSqlAny.Windows
 
         private void OnAddData_Click(object sender, RoutedEventArgs e)
         {
-            if (_dbAdapter == null)
+            if (!CheckConnectionErrors())
             {
-                App.ErrorMessage("Not found link to dbAdapter");
-                return;
-            }
-            if (_dbAdapter.CurrentStatus == ConnectionStatusType.Disconnected)
-            {
-                App.ErrorMessage("db not conneted");
                 return;
             }
 
-            var tableDataWindow = new DataTableWindow(_dbAdapter, TableName.Text, DataTableWindow.DateTableMode.AddData);
+            var tableDataWindow = new DataTableWindow(_dbAdapter, 
+                TableName.Text, 
+                UpdateQueryResult, 
+                DataTableWindow.DateTableMode.AddData);
+
             tableDataWindow.Owner = this;
-
-            var fields = _dbAdapter.GetFieldParams(TableName.Text);
-            var dt = SqlFieldProperty.GetDataTable(fields, true);
-            for (var i = 0; i < ADD_COUNT_ROW; i++)
-            {
-                var rw = dt.NewRow();
-                dt.Rows.Add(rw);
-            }
-            FillData(tableDataWindow.TableData, dt, false);
             tableDataWindow.ShowDialog();
         }
 
@@ -117,18 +111,12 @@ namespace WpfSqlAny.Windows
                 return;
             }
 
-            var tableDataWindow = new DataTableWindow(_dbAdapter, TableName.Text, DataTableWindow.DateTableMode.ChangeData);
+            var tableDataWindow = new DataTableWindow(_dbAdapter, 
+                TableName.Text, 
+                UpdateQueryResult, 
+                DataTableWindow.DateTableMode.ChangeData);
 
             tableDataWindow.Owner = this;
-            FillData(tableDataWindow.TableData, _dbAdapter.ReadFromTableAll(TableName.Text), true);
-            //var fields = _dbAdapter.GetFieldParams(TableName.Text);
-            //for(var i = 0; i < fields.Count; i++)
-            //{
-            //    if (fields[i].IsAutoIncrement)
-            //    {
-            //        (tableDataWindow.TableData.ed as DataGridTextColumn).IsReadOnly = true;
-            //    }
-            //}
             tableDataWindow.ShowDialog();
         }
 
@@ -154,26 +142,6 @@ namespace WpfSqlAny.Windows
             }
             _dbAdapter.DeleteColumn(TableName.Text, ColumnNameBlock.Text);
             UpdateQueryResult();
-        }
-
-        private void FillData(DataGrid dg, DataTable dt, bool readOnly)
-        {
-            //for (var i = 0; i < dt.Columns.Count; i++)
-            //{
-            //    dg.Columns.Add(new DataGridTextColumn
-            //    {
-            //        Header = dt.Columns[i].ColumnName,
-            //        Binding = new Binding($"[{dt.Columns[i].ColumnName}]")
-            //    });
-
-            //    for (var j = 0; j < dt.Rows.Count; j++)
-            //    {
-            //        dg.Columns[0].
-            //    }
-            //}
-
-            dg.ItemsSource = dt.AsDataView();
-            dg.IsReadOnly = readOnly;
         }
     }
 }

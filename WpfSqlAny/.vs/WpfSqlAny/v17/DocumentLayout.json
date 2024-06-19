@@ -1,0 +1,168 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\Git\\WPF\\WpfSqlAny\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|E:\\Git\\WPF\\WpfSqlAny\\wpfsqlany\\windows\\datatablewindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\windows\\datatablewindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|e:\\git\\wpf\\wpfsqlany\\wpfsqlany\\windows\\selectedtablewindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\windows\\selectedtablewindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|E:\\Git\\WPF\\WpfSqlAny\\wpfsqlany\\windows\\selectedtablewindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\windows\\selectedtablewindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|E:\\Git\\WPF\\WpfSqlAny\\wpfsqlany\\windows\\datatablewindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\windows\\datatablewindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|E:\\Git\\WPF\\WpfSqlAny\\wpfsqlany\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|E:\\Git\\WPF\\WpfSqlAny\\wpfsqlany\\windows\\creatingtablewindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\windows\\creatingtablewindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|E:\\Git\\WPF\\WpfSqlAny\\wpfsqlany\\logic\\supporttypes\\sqlfieldproperty.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\logic\\supporttypes\\sqlfieldproperty.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|E:\\Git\\WPF\\WpfSqlAny\\wpfsqlany\\logic\\supporttypes\\sqldatatype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\logic\\supporttypes\\sqldatatype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|E:\\Git\\WPF\\WpfSqlAny\\wpfsqlany\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{31A70136-8859-43CA-8B4E-B9E98F59C482}|WpfSqlAny\\WpfSqlAny.csproj|solutionrelative:wpfsqlany\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e1b7d1f8-9b3c-49b1-8f4f-bfc63a88835d}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SelectedTableWindow.xaml",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\SelectedTableWindow.xaml",
+              "RelativeDocumentMoniker": "WpfSqlAny\\Windows\\SelectedTableWindow.xaml",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\SelectedTableWindow.xaml",
+              "RelativeToolTip": "WpfSqlAny\\Windows\\SelectedTableWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-06-18T13:33:47.559Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DataTableWindow.xaml.cs",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\DataTableWindow.xaml.cs",
+              "RelativeDocumentMoniker": "WpfSqlAny\\Windows\\DataTableWindow.xaml.cs",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\DataTableWindow.xaml.cs",
+              "RelativeToolTip": "WpfSqlAny\\Windows\\DataTableWindow.xaml.cs",
+              "ViewState": "AQIAAFAAAAAAAAAAAAAawF0AAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-18T11:27:58.322Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DataTableWindow.xaml",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\DataTableWindow.xaml",
+              "RelativeDocumentMoniker": "WpfSqlAny\\Windows\\DataTableWindow.xaml",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\DataTableWindow.xaml",
+              "RelativeToolTip": "WpfSqlAny\\Windows\\DataTableWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-06-18T16:45:06.03Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "WpfSqlAny\\MainWindow.xaml.cs",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\MainWindow.xaml.cs",
+              "RelativeToolTip": "WpfSqlAny\\MainWindow.xaml.cs",
+              "ViewState": "AQIAAGYAAAAAAAAAAIAwwIQAAAAAAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADjSURBVDhPY0AGretv/t9x7tl/KJd0sOfii/\u002Bimfv\u002Bbzv7lGhDGBlid2Eo1pTkZNiSLsVQWVkJFWFgYGdnZygoKGAwNjZmhAphgt0XnsFd8P79\u002B/9Pnz6F47CwsP/R0dH/z549i2IhE5QGg1P3PzMsTtVgsFTiYvj27RtUFAF\u002B//7N0NfXx4BsCIoBIVoMDOaKnFg1wwDIkAkTJkB5oDBAAnFxcf/b29uhPNygsLCQYdWqVWC9KC748eMHlEU8QDGAHDBqABUMQEkHmZmZ/9\u002B\u002BfQvl4QbCwsIM06dPx50niAcMDADfJl5g9BqhpwAAAABJRU5ErkJggg==",
+              "WhenOpened": "2024-06-17T11:27:17.677Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SelectedTableWindow.xaml.cs",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\SelectedTableWindow.xaml.cs",
+              "RelativeDocumentMoniker": "WpfSqlAny\\Windows\\SelectedTableWindow.xaml.cs",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\SelectedTableWindow.xaml.cs",
+              "RelativeToolTip": "WpfSqlAny\\Windows\\SelectedTableWindow.xaml.cs",
+              "ViewState": "AQIAAIMAAAAAAAAAAAAhwJEAAAAAAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADjSURBVDhPY0AGretv/t9x7tl/KJd0sOfii/\u002Bimfv\u002Bbzv7lGhDGBlid2Eo1pTkZNiSLsVQWVkJFWFgYGdnZygoKGAwNjZmhAphgt0XnsFd8P79\u002B/9Pnz6F47CwsP/R0dH/z549i2IhE5QGg1P3PzMsTtVgsFTiYvj27RtUFAF\u002B//7N0NfXx4BsCIoBIVoMDOaKnFg1wwDIkAkTJkB5oDBAAnFxcf/b29uhPNygsLCQYdWqVWC9KC748eMHlEU8QDGAHDBqABUMQEkHmZmZ/9\u002B\u002BfQvl4QbCwsIM06dPx50niAcMDADfJl5g9BqhpwAAAABJRU5ErkJggg==",
+              "WhenOpened": "2024-06-18T11:15:28.785Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "CreatingTableWindow.xaml.cs",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\CreatingTableWindow.xaml.cs",
+              "RelativeDocumentMoniker": "WpfSqlAny\\Windows\\CreatingTableWindow.xaml.cs",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Windows\\CreatingTableWindow.xaml.cs",
+              "RelativeToolTip": "WpfSqlAny\\Windows\\CreatingTableWindow.xaml.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAAB4AAAAMAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADjSURBVDhPY0AGretv/t9x7tl/KJd0sOfii/\u002Bimfv\u002Bbzv7lGhDGBlid2Eo1pTkZNiSLsVQWVkJFWFgYGdnZygoKGAwNjZmhAphgt0XnsFd8P79\u002B/9Pnz6F47CwsP/R0dH/z549i2IhE5QGg1P3PzMsTtVgsFTiYvj27RtUFAF\u002B//7N0NfXx4BsCIoBIVoMDOaKnFg1wwDIkAkTJkB5oDBAAnFxcf/b29uhPNygsLCQYdWqVWC9KC748eMHlEU8QDGAHDBqABUMQEkHmZmZ/9\u002B\u002BfQvl4QbCwsIM06dPx50niAcMDADfJl5g9BqhpwAAAABJRU5ErkJggg==",
+              "WhenOpened": "2024-06-17T11:06:19.174Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "App.xaml.cs",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\App.xaml.cs",
+              "RelativeDocumentMoniker": "WpfSqlAny\\App.xaml.cs",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\App.xaml.cs",
+              "RelativeToolTip": "WpfSqlAny\\App.xaml.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAEwBYAAAAIAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADjSURBVDhPY0AGretv/t9x7tl/KJd0sOfii/\u002Bimfv\u002Bbzv7lGhDGBlid2Eo1pTkZNiSLsVQWVkJFWFgYGdnZygoKGAwNjZmhAphgt0XnsFd8P79\u002B/9Pnz6F47CwsP/R0dH/z549i2IhE5QGg1P3PzMsTtVgsFTiYvj27RtUFAF\u002B//7N0NfXx4BsCIoBIVoMDOaKnFg1wwDIkAkTJkB5oDBAAnFxcf/b29uhPNygsLCQYdWqVWC9KC748eMHlEU8QDGAHDBqABUMQEkHmZmZ/9\u002B\u002BfQvl4QbCwsIM06dPx50niAcMDADfJl5g9BqhpwAAAABJRU5ErkJggg==",
+              "WhenOpened": "2024-06-17T16:27:57.52Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SqlFieldProperty.cs",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Logic\\SupportTypes\\SqlFieldProperty.cs",
+              "RelativeDocumentMoniker": "WpfSqlAny\\Logic\\SupportTypes\\SqlFieldProperty.cs",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Logic\\SupportTypes\\SqlFieldProperty.cs",
+              "RelativeToolTip": "WpfSqlAny\\Logic\\SupportTypes\\SqlFieldProperty.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAASwBMAAAAsAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADtSURBVDhPYxgFCHDh4YX/sQtj/6u3qP9XblL\u002BHzk/8j9UiuHtx7f/VZpVwHxkNggwgohLjy79D18SzmAua86QZJbEwM/Bz3D91XWGCNMIRpAGo34jsGJkwMrMynCn9g5YP0PK0pT/3tO9/3/58gVuMjLA5wImEHH68WkGN3U3Bh4eHoiJJACwAb/\u002B/gI7CRuAeeH3398M8g3ycDayKxjC5oX9D54TjNX5IIDPC2Ann7x78n/E4ggGDw0PhgiDCLBrLj2/xJBhl0HQS3AFe67t\u002BT/lyBSGO2/uMHCxcTHYK9szdAd2kxwmIw8wMAAAESl0qwYO77cAAAAASUVORK5CYII=",
+              "WhenOpened": "2024-06-18T13:11:43.715Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "SqlDataType.cs",
+              "DocumentMoniker": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Logic\\SupportTypes\\SqlDataType.cs",
+              "RelativeDocumentMoniker": "WpfSqlAny\\Logic\\SupportTypes\\SqlDataType.cs",
+              "ToolTip": "E:\\Git\\WPF\\WpfSqlAny\\WpfSqlAny\\Logic\\SupportTypes\\SqlDataType.cs",
+              "RelativeToolTip": "WpfSqlAny\\Logic\\SupportTypes\\SqlDataType.cs",
+              "ViewState": "AQIAAEMAAAAAAAAAAADwv1gAAAAMAAAA",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADtSURBVDhPYxgFCHDh4YX/sQtj/6u3qP9XblL\u002BHzk/8j9UiuHtx7f/VZpVwHxkNggwgohLjy79D18SzmAua86QZJbEwM/Bz3D91XWGCNMIRpAGo34jsGJkwMrMynCn9g5YP0PK0pT/3tO9/3/58gVuMjLA5wImEHH68WkGN3U3Bh4eHoiJJACwAb/\u002B/gI7CRuAeeH3398M8g3ycDayKxjC5oX9D54TjNX5IIDPC2Ann7x78n/E4ggGDw0PhgiDCLBrLj2/xJBhl0HQS3AFe67t\u002BT/lyBSGO2/uMHCxcTHYK9szdAd2kxwmIw8wMAAAESl0qwYO77cAAAAASUVORK5CYII=",
+              "WhenOpened": "2024-06-18T13:14:01.611Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
