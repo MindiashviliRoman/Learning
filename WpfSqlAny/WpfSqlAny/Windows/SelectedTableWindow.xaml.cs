@@ -129,7 +129,10 @@ namespace WpfSqlAny.Windows
 
             if (!string.IsNullOrEmpty(ColumnNameBlock.Text))
             {
-                _dbAdapter.AddColumn(TableName.Text, ColumnNameBlock.Text, new SqlDataType());
+                var typeName = ColumnTypeComboBox.SelectedItem.ToString();
+
+                var dataType = SqlDataType.GetTypeFromName(typeName);
+                _dbAdapter.AddColumn(TableName.Text, ColumnNameBlock.Text, dataType);
                 UpdateQueryResult();
             }
         }

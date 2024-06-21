@@ -114,7 +114,7 @@ namespace WpfSqlAny.Logic
                 */
 
                 List<SqlFieldProperty> fieldParams = GetFieldParams(tableName);
-                fieldParams.Add(new SqlFieldProperty(false, columnName, columnType));
+                fieldParams.Add(new SqlFieldProperty(false, false, columnName, columnType));
                 string dublTabName = CreateDublOfTableByFields(tableName, fieldParams);
 
                 //Copy info from old Table to new
@@ -249,7 +249,7 @@ namespace WpfSqlAny.Logic
 
                         for (int i = 1; i < data.Rows.Count; i++)
                         {
-                            _dbCommand.CommandText += ", ('";
+                            _dbCommand.CommandText += ", ('" + data.Rows[i][0];
                             for (int j = 1; j < colCnt; j++)
                             {
                                 _dbCommand.CommandText += "' , '" + data.Rows[i][j];
@@ -268,7 +268,7 @@ namespace WpfSqlAny.Logic
 
         public DataTable ReadFromTable(string query)
         {
-            DataTable dTable = new DataTable();
+            var dTable = new DataTable();
 
             if (_dbConnection.State != ConnectionState.Open)
             {
@@ -306,10 +306,10 @@ namespace WpfSqlAny.Logic
         public List<SqlFieldProperty> GetFieldParams(string tableName)
         {
             List<SqlFieldProperty> result = new List<SqlFieldProperty>();
-            using (SQLiteCommand cmdSQL = _dbConnection.CreateCommand())
+            using (var cmdSQL = _dbConnection.CreateCommand())
             {
                 cmdSQL.CommandText = "SELECT * FROM " + tableName;
-                SQLiteDataReader dr = cmdSQL.ExecuteReader();
+                var dr = cmdSQL.ExecuteReader();
 
                 using (var schemaTable = dr.GetSchemaTable())
                 {
@@ -319,7 +319,8 @@ namespace WpfSqlAny.Logic
 
                         var columnName = row.Field<string>("ColumnName");
                         var dataTypeName = row.Field<string>("DataTypeName");
-                        var isAutoIncreent = row.Field<bool>("IsAutoIncrement");
+                        var isAutoIncrement = row.Field<bool>("IsAutoIncrement");
+                        var isKey = row.Field<bool>("IsKey");
 
                         //var numericPrecision = row.Field<int>("NumericPrecision");
                         //var numericScale = row.Field<int>("NumericScale");
@@ -332,10 +333,8 @@ namespace WpfSqlAny.Logic
                         //var isRowVersion = row.Field<bool>("IsRowVersion");
                         //var providerType = row.Field<int>("ProviderType");
 
-                        var curParams = new SqlFieldProperty();
-                        curParams.Name = columnName;
-                        curParams.Type = SqlDataType.GetTypeFromName(dr.GetDataTypeName(i));//dr.GetFieldType(i).ToString();
-                        curParams.IsAutoIncrement = isAutoIncreent;
+                        var type = SqlDataType.GetTypeFromName(dr.GetDataTypeName(i));//dr.GetFieldType(i).ToString();
+                        var curParams = new SqlFieldProperty(isKey, isAutoIncrement, columnName, type);
 
                         result.Add(curParams);
                     }
@@ -406,11 +405,11 @@ namespace WpfSqlAny.Logic
         private List<string> GetFieldNames2(SQLiteConnection conn, string tName)
         {
             List<string> result = new List<string>();
-            using (SQLiteCommand cmdSQL = conn.CreateCommand())
+            using (var cmdSQL = conn.CreateCommand())
             {
-                string sqlQuery = @"pragma table_info(" + tName + ");";
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter(sqlQuery, conn);
-                DataTable dt = new DataTable();
+                var sqlQuery = @"pragma table_info(" + tName + ");";
+                var adapter = new SQLiteDataAdapter(sqlQuery, conn);
+                var dt = new DataTable();
                 adapter.Fill(dt);
                 result = App.GetDataByColumnName(App.NAME_TABLE_HEADER, dt);
             }

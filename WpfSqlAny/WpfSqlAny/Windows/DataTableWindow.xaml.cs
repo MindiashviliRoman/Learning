@@ -37,6 +37,7 @@ namespace WpfSqlAny.Windows
 
         private Action _updateData;
         private List<SqlFieldProperty> _fields = null;
+        private Dictionary<string, int> _fieldNameToIndx = new Dictionary<string, int>();
 
         const int ADD_COUNT_ROW = 10;
 
@@ -55,6 +56,12 @@ namespace WpfSqlAny.Windows
             _updateData = updateQueryInfo;
 
             _fields = _dbAdapter.GetFieldParams(_tableName);
+
+            for (var i = 0; i < _fields.Count; i++)
+            {
+                _fieldNameToIndx[_fields[i].Name] = i;
+            }
+
             if (mode == DateTableMode.AddData)
             {
                 var dt = SqlFieldProperty.GetDataTable(_fields, true);
@@ -87,17 +94,17 @@ namespace WpfSqlAny.Windows
             //    }
             //}
 
-            foreach(var fld in _fields)
-            {
-                var dataGridTemplate = new DataGridTemplateColumn();
-                var factory = new FrameworkElementFactory(typeof(TextBlock));
-                factory.SetValue(TextBlock.StyleProperty, "Delete Table");
-                var cellTemplate = new DataTemplate();
-                cellTemplate.VisualTree = factory;
-                dataGridTemplate.Header = "action";
-                dataGridTemplate.CellTemplate = cellTemplate;
-                dg.Columns.Add(dataGridTemplate);
-            }
+            //foreach(var fld in _fields)
+            //{
+            //    var dataGridTemplate = new DataGridTemplateColumn();
+            //    var factory = new FrameworkElementFactory(typeof(TextBlock));
+            //    //factory.SetValue(TextBlock.StyleProperty, "Delete Table");
+            //    var cellTemplate = new DataTemplate();
+            //    cellTemplate.VisualTree = factory;
+            //    dataGridTemplate.Header = "action";
+            //    dataGridTemplate.CellTemplate = cellTemplate;
+            //    dg.Columns.Add(dataGridTemplate);
+            //}
 
             dg.ItemsSource = dt.AsDataView();
             dg.IsReadOnly = readOnly;
@@ -167,11 +174,12 @@ namespace WpfSqlAny.Windows
             foreach (var item in dg.ItemsSource)
             {
                 var table = (item as DataRowView).Row.Table;
-                for (var i = 0; i< table.Columns.Count; i++)
+                for (var i = 0; i < table.Columns.Count; i++)
                 {
                     var column = table.Columns[i];
                     dataTable.Columns.Add(column.ToString());
-                    dataTable.Columns[i].DataType = _fields[i].Type.GetMappedType();
+                    var filed = _fields[_fieldNameToIndx[column.ColumnName]];
+                    dataTable.Columns[i].DataType = filed.Type.GetMappedType();
                 }
                 break;
             }

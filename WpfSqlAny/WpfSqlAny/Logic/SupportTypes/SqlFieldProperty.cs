@@ -4,15 +4,17 @@ using System.Linq;
 
 namespace WpfSqlAny.Logic.SupportTypes
 {
-    public struct SqlFieldProperty
+    public class SqlFieldProperty
     {
         public bool IsAutoIncrement;
+        public bool IsKey;
         public string Name;
         public SqlDataType Type;
 
-        public SqlFieldProperty(bool isKey, string name, SqlDataType type)
+        public SqlFieldProperty(bool isKey, bool isAutoIncrement, string name, SqlDataType type)
         {
-            IsAutoIncrement = isKey;
+            IsKey = isKey;
+            IsAutoIncrement = isAutoIncrement;
             Name = name;
             Type = type;
         }

@@ -52,8 +52,11 @@ namespace WpfSqlAny
 
         private void InitDB()
         {
-            _adapter = new SqlLiteAdapter();
+            //_adapter = new SqlLiteAdapter();
+            //_adapter.Init("MySQL.sqlite");
+            _adapter = new PostgreAdapter();
             _adapter.Init("MySQL.sqlite");
+
 
             ChangeStatusField(ConnectionStatusType.Disconnected);
 

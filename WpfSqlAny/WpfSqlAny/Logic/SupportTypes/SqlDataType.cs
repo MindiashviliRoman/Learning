@@ -87,9 +87,10 @@ namespace WpfSqlAny.Logic.SupportTypes
         public static SqlDataType GetTypeFromName(string name)
         {
             var result = new SqlDataType(DataType.Not_Valid);
+            var upperName = name.ToUpper();
             for (var i = 0; i < dataTypeNames.Length; i++)
             {
-                if (name.Contains(dataTypeNames[i]))
+                if (upperName.Contains(dataTypeNames[i]))
                 {
                     result.DType = dataTypeValues[i];
                     switch (result.DType)
