@@ -74,7 +74,16 @@ namespace WpfSqlAny.Windows
             }
             else
             {
-                FillData(TableDataGrid, _dbAdapter.ReadFromTableAll(_tableName), true);
+                var fields = SqlFieldProperty.GetDataTable(_fields, false);
+                var dt = _dbAdapter.ReadFromTableAll(_tableName);
+                for (var i = _fields.Count - 1; i > -1; i--) 
+                {
+                    if (_fields[i].IsAutoIncrement)
+                    {
+                        dt.Columns.RemoveAt(i);
+                    }
+                }
+                FillData(TableDataGrid, dt, false);
             }
         }
 
@@ -134,15 +143,23 @@ namespace WpfSqlAny.Windows
             switch(Mode)
             {
                 case DateTableMode.AddData:
-                    var data = GetDataTable(TableDataGrid);
-                    if (!ValidateData(data))
-                        return;
-        
-                    _dbAdapter.SaveDataToDB(data, _tableName);
-                    break;
-                case DateTableMode.ChangeData:
+                    {
+                        var data = GetDataTable(TableDataGrid);
+                        if (!ValidateData(data))
+                            return;
 
-                    break;
+                        _dbAdapter.AddDataToDB(data, _tableName);
+                        break;
+                    }
+                case DateTableMode.ChangeData:
+                    {
+                        var data = GetDataTable(TableDataGrid);
+                        if (!ValidateData(data))
+                            return;
+
+                        _dbAdapter.UpdateDataToDB(data, _tableName);
+                        break;
+                    }
             }
 
             _updateData?.Invoke();

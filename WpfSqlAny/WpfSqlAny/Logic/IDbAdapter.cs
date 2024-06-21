@@ -23,7 +23,9 @@ namespace WpfSqlAny.Logic
 
         void ClearTable(string tName);
 
-        void SaveDataToDB(DataTable data, string tableName);
+        void AddDataToDB(DataTable data, string tableName);
+
+        void UpdateDataToDB(DataTable data, string tableName);
 
         DataTable GetTablesNames();
         DataTable ReadFromTable(string query);

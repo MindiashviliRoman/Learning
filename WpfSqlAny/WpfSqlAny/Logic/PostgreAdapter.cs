@@ -209,7 +209,7 @@ namespace WpfSqlAny.Logic
             }
         }
 
-        public void SaveDataToDB(DataTable data, string tableName)
+        public void AddDataToDB(DataTable data, string tableName)
         {
             try
             {
@@ -250,6 +250,11 @@ namespace WpfSqlAny.Logic
             {
                 MessageBox.Show("Error: " + ex.Message);
             }
+        }
+
+        public void UpdateDataToDB(DataTable data, string tableName)
+        {
+
         }
 
         public DataTable ReadFromTable(string query)
