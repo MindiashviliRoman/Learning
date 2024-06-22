@@ -76,13 +76,13 @@ namespace WpfSqlAny.Windows
             {
                 var fields = SqlFieldProperty.GetDataTable(_fields, false);
                 var dt = _dbAdapter.ReadFromTableAll(_tableName);
-                for (var i = _fields.Count - 1; i > -1; i--) 
-                {
-                    if (_fields[i].IsAutoIncrement)
-                    {
-                        dt.Columns.RemoveAt(i);
-                    }
-                }
+                //for (var i = _fields.Count - 1; i > -1; i--) 
+                //{
+                //    if (_fields[i].IsAutoIncrement)
+                //    {
+                //        dt.Columns.RemoveAt(i);
+                //    }
+                //}
                 FillData(TableDataGrid, dt, false);
             }
         }
@@ -115,6 +115,16 @@ namespace WpfSqlAny.Windows
             //    dg.Columns.Add(dataGridTemplate);
             //}
 
+            for (var i = 0; i < dt.Columns.Count; i++)
+            {
+                var column = dt.Columns[i];
+                var field = _fields[_fieldNameToIndx[column.ColumnName]];
+                if (field.IsAutoIncrement)
+                {
+                    dt.Columns[i].ReadOnly = true;
+                }
+            }
+
             dg.ItemsSource = dt.AsDataView();
             dg.IsReadOnly = readOnly;
         }
@@ -145,8 +155,8 @@ namespace WpfSqlAny.Windows
                 case DateTableMode.AddData:
                     {
                         var data = GetDataTable(TableDataGrid);
-                        if (!ValidateData(data))
-                            return;
+                        //if (!ValidateData(data))
+                        //    return;
 
                         _dbAdapter.AddDataToDB(data, _tableName);
                         break;
@@ -154,10 +164,10 @@ namespace WpfSqlAny.Windows
                 case DateTableMode.ChangeData:
                     {
                         var data = GetDataTable(TableDataGrid);
-                        if (!ValidateData(data))
-                            return;
+                        //if (!ValidateData(data))
+                        //    return;
 
-                        _dbAdapter.UpdateDataToDB(data, _tableName);
+                        _dbAdapter.UpdateDataToDB(data, _tableName, _fields);
                         break;
                     }
             }
@@ -165,25 +175,25 @@ namespace WpfSqlAny.Windows
             _updateData?.Invoke();
         }
 
-        private bool ValidateData(DataTable dt)
-        {
-            for(var i = 0; i < dt.Rows.Count; i++)
-            {
-                var row = dt.Rows[i];
-                for(var j = 0; j < row.ItemArray.Length; j++)
-                {
-                    var column = dt.Columns[j];
-                    var dataType = column.DataType;
-                    var cell = row.ItemArray[j];
-                    if(cell.ToString() == "" && dataType == typeof(Int64))
-                    {
-                        App.ErrorMessage($"Not correct dataType for column: {column.ColumnName} and rowIndex: {i}");
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
+        //private bool ValidateData(DataTable dt)
+        //{
+        //    for(var i = 0; i < dt.Rows.Count; i++)
+        //    {
+        //        var row = dt.Rows[i];
+        //        for(var j = 0; j < row.ItemArray.Length; j++)
+        //        {
+        //            var column = dt.Columns[j];
+        //            var dataType = column.DataType;
+        //            var cell = row.ItemArray[j];
+        //            if(cell.ToString() == "" && dataType == typeof(Int64))
+        //            {
+        //                App.ErrorMessage($"Not correct dataType for column: {column.ColumnName} and rowIndex: {i}");
+        //                return false;
+        //            }
+        //        }
+        //    }
+        //    return true;
+        //}
 
         private DataTable GetDataTable(DataGrid dg)
         {
@@ -195,8 +205,8 @@ namespace WpfSqlAny.Windows
                 {
                     var column = table.Columns[i];
                     dataTable.Columns.Add(column.ToString());
-                    var filed = _fields[_fieldNameToIndx[column.ColumnName]];
-                    dataTable.Columns[i].DataType = filed.Type.GetMappedType();
+                    var field = _fields[_fieldNameToIndx[column.ColumnName]];
+                    dataTable.Columns[i].DataType = field.Type.GetMappedType();
                 }
                 break;
             }
@@ -211,12 +221,6 @@ namespace WpfSqlAny.Windows
                         dataTable.Rows.Add(row.ItemArray);
                         break;
                     }
-                    //var count = row.ItemArray.Length;
-                    //var values = new object[count];
-                    //for (int i = 0; i < count; i++)
-                    //{
-                    //    values[i] = row.ItemArray[i];
-                    //}
                 }
             }
 

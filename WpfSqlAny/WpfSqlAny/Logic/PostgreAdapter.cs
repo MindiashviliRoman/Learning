@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Linq;
+using System.Text;
 using System.Windows;
 using Npgsql;
 using WpfSqlAny.Logic.SupportTypes;
@@ -15,6 +14,8 @@ namespace WpfSqlAny.Logic
         private NpgsqlConnection _dbConnection;
         private NpgsqlCommand _dbCommand;
         private string _dbPath;
+
+        private const int LONG_QUEUE_STRING_MAX_LENG = 10000;
 
         #region IDbAdapter
         public Action<ConnectionStatusType> StatusChanged { get; set; }
@@ -252,9 +253,256 @@ namespace WpfSqlAny.Logic
             }
         }
 
-        public void UpdateDataToDB(DataTable data, string tableName)
+        public void UpdateDataToDB(DataTable data, string tableName, List<SqlFieldProperty> _fields)
         {
+            //INSERT INTO table_users(cod_user, date, user_rol, cod_office)
+            var strBuilder = new StringBuilder(LONG_QUEUE_STRING_MAX_LENG);
 
+            var autoIncrementIndx = new List<int>();
+            for (var i = 0; i < _fields.Count; i++)
+            {
+                if (_fields[i].IsAutoIncrement)
+                {
+                    autoIncrementIndx.Add(i);
+                }
+            }
+
+            try
+            {
+                int colCnt = data.Columns.Count;
+                if (colCnt > 0)
+                {
+                    strBuilder.Append("INSERT INTO ");
+                    strBuilder.Append(tableName);
+                    strBuilder.Append(" (");
+                    strBuilder.Append(data.Columns[0].ColumnName);
+                    for (int i = 1; i < colCnt; i++)
+                    {
+                        strBuilder.Append(", ");
+                        strBuilder.Append(data.Columns[i].ColumnName);
+                    }
+                    strBuilder.Append(") VALUES");
+                    strBuilder.Append("(");
+
+                    if (data.Rows.Count > 0)
+                    {
+                        var value0 = data.Rows[0][0].ToString();
+                        var flgPrevValueIsNull = string.IsNullOrEmpty(value0);
+                        if(_fields[0].IsAutoIncrement && flgPrevValueIsNull)
+                        {
+                            strBuilder.Append("DEFAULT");
+                        }
+                        else
+                        {
+                            strBuilder.Append($"'");
+                            strBuilder.Append(value0);
+                        }
+
+                        for (int j = 1; j < colCnt; j++)
+                        {
+                            var value = data.Rows[0][j].ToString();
+                            strBuilder.Append(_fields[j - 1].IsAutoIncrement && flgPrevValueIsNull ? ", " : "', ");
+                            flgPrevValueIsNull = string.IsNullOrEmpty(value);
+                            if (_fields[j].IsAutoIncrement && flgPrevValueIsNull)
+                            {
+                                strBuilder.Append("DEFAULT");
+                            }
+                            else
+                            {
+                                strBuilder.Append($"'");
+                                strBuilder.Append(value);
+                            }     
+                        }
+                        strBuilder.Append("')");
+
+                        for (int i = 1; i < data.Rows.Count; i++)
+                        {
+                            var value01 = data.Rows[i][0].ToString();
+                            flgPrevValueIsNull = string.IsNullOrEmpty(value01);
+                            if(_fields[0].IsAutoIncrement && flgPrevValueIsNull)
+                            {
+                                strBuilder.Append(", (DEFAULT");
+                            }
+                            else
+                            {
+                                strBuilder.Append(", ('");
+                                strBuilder.Append(value01);
+                            }
+
+                            for (int j = 1; j < colCnt; j++)
+                            {
+                                var value = data.Rows[i][j].ToString();
+                                strBuilder.Append(_fields[j - 1].IsAutoIncrement && flgPrevValueIsNull ? ", " : "', ");
+                                flgPrevValueIsNull = string.IsNullOrEmpty(value);
+                                if(_fields[j].IsAutoIncrement && flgPrevValueIsNull)
+                                {
+                                    strBuilder.Append("DEFAULT");
+                                }
+                                else 
+                                {
+                                    strBuilder.Append("'");
+                                    strBuilder.Append(value);
+                                }
+
+                            }
+                            strBuilder.Append(_fields[colCnt - 1].IsAutoIncrement && flgPrevValueIsNull ? ")" : "')");
+                        }
+                    }
+
+                    //strBuilder.Append(");");
+                    //strBuilder.Append(") ON DUPLICATE KEY(");
+                    strBuilder.Append(" ON CONFLICT(");
+
+                    if (autoIncrementIndx.Count > 0)
+                    {
+                        strBuilder.Append(_fields[autoIncrementIndx[0]].Name);
+                        for (var i = 1; i < autoIncrementIndx.Count; i++)
+                        {
+                            strBuilder.Append(", ");
+                            strBuilder.Append(autoIncrementIndx[i]);
+                        }
+                        strBuilder.Append(") DO UPDATE ");
+
+                        //Conflict can be if columns count > 1 only ? :TODO
+
+                        var wasAddedFirst = false;
+                        for (int i = 0; i < colCnt; i++)
+                        {
+                            if (!autoIncrementIndx.Contains(i))
+                            {
+                                if (wasAddedFirst)
+                                {
+                                    strBuilder.Append(", ");
+                                }
+                                else
+                                {
+                                    strBuilder.Append("SET ");
+                                }
+                                strBuilder.Append(data.Columns[i].ColumnName);
+                                strBuilder.Append("=");
+                                strBuilder.Append("EXCLUDED.");
+                                strBuilder.Append(data.Columns[i].ColumnName); //strBuilder.Append(paramField[i]);
+                                wasAddedFirst = true;
+                            }
+                        }
+                    }
+                    strBuilder.Append(";");
+
+                    _dbCommand.CommandText = strBuilder.ToString();
+                    _dbCommand.ExecuteNonQuery();
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        public void UpdateDataToDB2(DataTable data, string tableName, List<SqlFieldProperty> _fields)
+        {
+            //INSERT INTO table_users(cod_user, date, user_rol, cod_office)
+            var strBuilder = new StringBuilder(LONG_QUEUE_STRING_MAX_LENG);
+
+            var autoIncrementIndx = new List<int>();
+            for(var i = 0; i < _fields.Count; i++)
+            {
+                if (_fields[i].IsAutoIncrement)
+                {
+                    autoIncrementIndx.Add(i);
+                }
+            }
+
+            try
+            {
+                int colCnt = data.Columns.Count;
+                var paramField = new string[colCnt];
+                if (colCnt > 0)
+                {
+                    strBuilder.Append("INSERT INTO ");
+                    strBuilder.Append(tableName);
+                    strBuilder.Append(" (");
+                    strBuilder.Append(data.Columns[0].ColumnName);
+                    for (int i = 1; i < colCnt; i++)
+                    {
+                        strBuilder.Append(", ");
+                        strBuilder.Append(data.Columns[i].ColumnName);
+                    }
+                    strBuilder.Append(") VALUES");
+
+                    paramField[0] = $"@{data.Columns[0].ColumnName}";
+                    strBuilder.Append("(");
+                    strBuilder.Append(paramField[0]);
+                    for (int i = 1; i < colCnt; i++)
+                    {
+                        paramField[i] = $"@{data.Columns[i].ColumnName}";
+                        strBuilder.Append(", ");
+                        strBuilder.Append(paramField[i]);
+                    }
+                    //strBuilder.Append(");");
+                    //strBuilder.Append(") ON DUPLICATE KEY(");
+                    strBuilder.Append(") ON CONFLICT(");
+
+                    if (autoIncrementIndx.Count > 0)
+                    {
+                        strBuilder.Append(_fields[autoIncrementIndx[0]].Name);
+                        for (var i = 1; i < autoIncrementIndx.Count; i++)
+                        {
+                            strBuilder.Append(", ");
+                            strBuilder.Append(autoIncrementIndx[i]);
+                        }
+                        strBuilder.Append(") DO UPDATE ");
+                        //strBuilder.Append(tableName);
+
+                        //Conflict can be if columns count > 1 only ? :TODO
+
+                        var wasAddedFirst = false;
+                        for (int i = 0; i < colCnt; i++)
+                        {
+                            if (!autoIncrementIndx.Contains(i))
+                            {
+                                if (wasAddedFirst)
+                                {
+                                    strBuilder.Append(", ");
+                                }
+                                else
+                                {
+                                    strBuilder.Append("SET ");
+                                }
+                                strBuilder.Append(data.Columns[i].ColumnName);
+                                strBuilder.Append("=");
+                                strBuilder.Append("EXCLUDED.");
+                                strBuilder.Append(data.Columns[i].ColumnName); //strBuilder.Append(paramField[i]);
+                                wasAddedFirst = true;
+                            }
+                        }
+                    }
+                    strBuilder.Append(";");
+
+                    if (data.Rows.Count > 0)
+                    {
+                        for (var i = 0; i < data.Rows.Count; i++)
+                        {
+                            for (var j = 0; j < paramField.Length; j++)
+                            {
+                                if (_fields[j].IsAutoIncrement && string.IsNullOrEmpty(data.Rows[i][j].ToString()))
+                                {
+                                    _dbCommand.Parameters.AddWithValue(paramField[j], "default");
+                                }
+                                else
+                                {
+                                    _dbCommand.Parameters.AddWithValue(paramField[j], data.Rows[i][j]);
+                                }
+                            }
+                        }
+                        _dbCommand.CommandText = strBuilder.ToString();
+                        _dbCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
         }
 
         public DataTable ReadFromTable(string query)
@@ -266,14 +514,6 @@ namespace WpfSqlAny.Logic
                 App.ErrorMessage("Open connection with database");
                 return null;
             }
-
-            //using (SQLiteCommand cmd = new SQLiteCommand(query, _dbConnection))
-            //{
-            //    using (SQLiteDataReader rdr = cmd.ExecuteReader())
-            //    {
-            //        dTable.Load(rdr);
-            //    }
-            //}
 
             try
             {
@@ -380,8 +620,6 @@ namespace WpfSqlAny.Logic
 
             try
             {
-                //_dbConnection = new SQLiteConnection("Data Source=" + _dbPath + ";Version=3;");
-                //_dbConnection.Open();
                 _dbCommand.Connection = _dbConnection;
 
                 CurrentStatus = ConnectionStatusType.Connected;
@@ -393,51 +631,6 @@ namespace WpfSqlAny.Logic
                 StatusChanged?.Invoke(ConnectionStatusType.Disconnected);
                 Console.WriteLine("Error: " + ex.Message);
             }
-        }
-
-        private void ShowFieldsName(string tabName)
-        {
-            List<string> FieldNames = GetFieldNames2(_dbConnection, tabName);
-            string sInfo = "";
-            for (int i = 0; i < FieldNames.Count; i++)
-            {
-                sInfo = sInfo + "\r\n" + FieldNames[i];
-            }
-            MessageBox.Show(sInfo);
-        }
-
-        //public List<string> GetFieldNames(SQLiteConnection conn, string tName)
-        //{
-        //    string curName = "";
-        //    List<string> result = new List<string>();
-        //    using (SQLiteCommand cmdSQL = _dbConnection.CreateCommand())
-        //    {
-        //        cmdSQL.CommandText = "select * from " + tName;
-        //        SQLiteDataReader dr = cmdSQL.ExecuteReader();
-        //        for (var i = 0; i < dr.FieldCount; i++)
-        //        {
-        //            curName = dr.GetName(i);
-        //            if (curName.ToUpper() != "ID")
-        //            {
-        //                result.CreateTable(dr.GetName(i));
-        //            }
-        //        }
-        //    }
-        //    return result;
-        //}
-
-        private List<string> GetFieldNames2(NpgsqlConnection conn, string tName)
-        {
-            List<string> result = new List<string>();
-            using (var cmdSQL = conn.CreateCommand())
-            {
-                string sqlQuery = @"pragma table_info(" + tName + ");";
-                var adapter = new NpgsqlDataAdapter(sqlQuery, conn);
-                DataTable dt = new DataTable();
-                adapter.Fill(dt);
-                result = App.GetDataByColumnName(App.NAME_TABLE_HEADER, dt);
-            }
-            return result;
         }
 
         private string CreateDublOfTableByFields(string tName, List<SqlFieldProperty> paramsOfTable)

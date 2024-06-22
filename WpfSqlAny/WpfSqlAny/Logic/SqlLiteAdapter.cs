@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Text;
 using System.Windows;
 using WpfSqlAny.Logic.SupportTypes;
 
@@ -14,6 +15,8 @@ namespace WpfSqlAny.Logic
         private SQLiteConnection _dbConnection;
         private SQLiteCommand _dbCommand;
         private string _dbPath;
+
+        private const int LONG_QUEUE_STRING_MAX_LENG = 10000;
 
         #region IDbAdapter
         public Action<ConnectionStatusType> StatusChanged { get; set; }
@@ -266,9 +269,62 @@ namespace WpfSqlAny.Logic
             }
         }
 
-        public void UpdateDataToDB(DataTable data, string tableName)
+        public void UpdateDataToDB(DataTable data, string tableName, List<SqlFieldProperty> _fields)
         {
+            //INSERT INTO table_users(cod_user, date, user_rol, cod_office)
+            var strBuilder = new StringBuilder(LONG_QUEUE_STRING_MAX_LENG);
+            try
+            {
+                int colCnt = data.Columns.Count;
 
+                if (colCnt > 0)
+                {
+                    strBuilder.Append("INSERT OR REPLACE INTO " + tableName + " (" + "'" + data.Columns[0].ColumnName + "'");
+                    for (int i = 1; i < colCnt; i++)
+                    {
+                        strBuilder.Append(", '" + data.Columns[i].ColumnName + "'");
+                    }
+                    strBuilder.Append(") VALUES");
+                    //sqlCmd.CommandText = "INSERT INTO " + tabName + " ('author', 'book') VALUES";
+                    if (data.Rows.Count > 0)
+                    {
+                        var value0 = data.Rows[0][0].ToString();
+                        var flgPrevValueIsNull = string.IsNullOrEmpty(value0);
+                        strBuilder.Append(_fields[0].IsAutoIncrement && flgPrevValueIsNull ? $"(NULL" : $"('{value0}");
+
+                        for (int j = 1; j < colCnt; j++)
+                        {
+                            var value = data.Rows[0][j].ToString();
+                            strBuilder.Append(_fields[j - 1].IsAutoIncrement && flgPrevValueIsNull ? ", " : "', ");
+                            flgPrevValueIsNull = string.IsNullOrEmpty(value);
+                            strBuilder.Append(_fields[j].IsAutoIncrement && flgPrevValueIsNull ? "NULL" : $"'{value}");
+                        }
+                        strBuilder.Append("')");
+
+                        for (int i = 1; i < data.Rows.Count; i++)
+                        {
+                            var value01 = data.Rows[i][0].ToString();
+                            flgPrevValueIsNull = string.IsNullOrEmpty(value01);
+                            strBuilder.Append(_fields[0].IsAutoIncrement && flgPrevValueIsNull ? $", (NULL" : $", ('{value01}");
+
+                            for (int j = 1; j < colCnt; j++)
+                            {
+                                var value = data.Rows[i][j].ToString();
+                                strBuilder.Append(_fields[j - 1].IsAutoIncrement && flgPrevValueIsNull ? ", " : "', ");
+                                flgPrevValueIsNull = string.IsNullOrEmpty(value);
+                                strBuilder.Append(_fields[j].IsAutoIncrement && flgPrevValueIsNull ? "NULL" : $"'{value}");
+                            }
+                            strBuilder.Append(_fields[colCnt - 1].IsAutoIncrement && flgPrevValueIsNull ? ")" : "')");
+                        }
+                        _dbCommand.CommandText = strBuilder.ToString();
+                        _dbCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
         }
 
         public DataTable ReadFromTable(string query)

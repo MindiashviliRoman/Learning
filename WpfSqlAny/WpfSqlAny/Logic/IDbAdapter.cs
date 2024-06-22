@@ -25,7 +25,7 @@ namespace WpfSqlAny.Logic
 
         void AddDataToDB(DataTable data, string tableName);
 
-        void UpdateDataToDB(DataTable data, string tableName);
+        void UpdateDataToDB(DataTable data, string tableName, List<SqlFieldProperty> _fields);
 
         DataTable GetTablesNames();
         DataTable ReadFromTable(string query);

@@ -25,7 +25,7 @@ namespace WpfSqlAny.Logic.SupportTypes
             var i = 0;
             foreach (var field in fields)
             {
-                if(exceptAutoIncrement && !field.IsAutoIncrement)
+                if(!exceptAutoIncrement || !field.IsAutoIncrement)
                 {
                     dt.Columns.Add(field.Name);
                     dt.Columns[i].DataType = field.Type.GetMappedType();
