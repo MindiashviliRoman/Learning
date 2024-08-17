@@ -9,13 +9,22 @@
     <Grid>
 
         <ToolBar x:Name="toolBar" HorizontalAlignment ="Stretch" VerticalAlignment="Top" Height="48" Margin="0,0,0.333,0">
-            <UniformGrid x:Name= "toolBarGrid" Rows="2" Columns ="6" VerticalAlignment="Center">
+            <UniformGrid x:Name= "toolBarGrid" Rows="2" Columns ="3" VerticalAlignment="Center" Width="500">
                 <UniformGrid.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                         <GradientStop Color="#FFE42424" Offset="1"/>
                     </LinearGradientBrush>
                 </UniformGrid.Background>
-                <Button Content="Create" Foreground="#FF2214F5" BorderBrush="#FFD9DF12" BorderThickness="2">
+                <ComboBox 
+                             x:Name="DataBaseTypeComboBox" 
+                             Text = "Type" 
+                             Background = "Aquamarine" 
+                             BorderBrush="YellowGreen"
+                             Foreground ="Coral"
+                             BorderThickness="3"
+                             VerticalContentAlignment="Center"/>
+                
+                <Button Content="Connect" Foreground="#FF2214F5" BorderBrush="#FFD9DF12" BorderThickness="2">
                     <Button.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="Black"/>
@@ -24,7 +33,8 @@
                         </LinearGradientBrush>
                     </Button.Background>
                 </Button>
-                <Button Content="Connect" Foreground="#FF2214F5" BorderBrush="#FFD9DF12" BorderThickness="2">
+
+                <Button Content="Create table" Foreground="#FF2214F5" BorderBrush="#FFD9DF12" BorderThickness="2">
                     <Button.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="Black"/>

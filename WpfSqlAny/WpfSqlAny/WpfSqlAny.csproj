@@ -47,6 +47,9 @@
     <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.8.0.0\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Npgsql, Version=8.0.3.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.8.0.3\lib\netstandard2.0\Npgsql.dll</HintPath>
     </Reference>
@@ -108,13 +111,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Logic\DataBaseFinder\DatabaseProvider.cs" />
     <Compile Include="Logic\ConnectionStatusType.cs" />
     <Compile Include="Logic\PostgreAdapter.cs" />
+    <Compile Include="Logic\SupportTypes\DataBaseType.cs" />
     <Compile Include="Logic\SupportTypes\DataTableExtension.cs" />
     <Compile Include="Logic\IRequestToTables.cs" />
     <Compile Include="Logic\IShowWithStringCallback.cs" />
     <Compile Include="Logic\SupportTypes\SqlDataType.cs" />
     <Compile Include="Logic\SupportTypes\SqlFieldProperty.cs" />
+    <Compile Include="Windows\CreateOrOpenDbWindow.xaml.cs">
+      <DependentUpon>CreateOrOpenDbWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\CreatingTableWindow.xaml.cs">
       <DependentUpon>CreatingTableWindow.xaml</DependentUpon>
     </Compile>
@@ -138,6 +146,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\CreateOrOpenDbWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\CreatingTableWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WpfSqlAny.Logic;
+using WpfSqlAny.Logic.SupportTypes;
 using WpfSqlAny.Windows;
 
 namespace WpfSqlAny
@@ -25,29 +26,39 @@ namespace WpfSqlAny
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IDisposable
     {
         #region SupportClass
         private class TablesProperies
         {
             public string Name { get; set; }
         }
-
         #endregion
 
+
         private IDbAdapter _adapter;
+        private DataBaseType _selectedDatabaseType;
 
         public MainWindow()
         {
             InitializeComponent();
 
             //Subscribing as example from C# code. But it can be added from xaml
-            (this.toolBarGrid.Children[0] as Button).Click += CreateTable_Click;
             (this.toolBarGrid.Children[1] as Button).Click += Connect_Click;
+            (this.toolBarGrid.Children[2] as Button).Click += CreateTable_Click;
 
             tabl.MouseDoubleClick += CatalogsRow_MouseDoubleClick;
 
-            InitDB();
+            var databaseTypeNames = Enum.GetNames(typeof(DataBaseType));
+            DataBaseTypeComboBox.ItemsSource = databaseTypeNames;
+            DataBaseTypeComboBox.DataContextChanged += DataBaseTypeComboBox_DataContextChanged;
+
+            _selectedDatabaseType = (DataBaseType)DataBaseTypeComboBox.SelectedIndex;
+        }
+
+        private void DataBaseTypeComboBox_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            _selectedDatabaseType = (DataBaseType)DataBaseTypeComboBox.SelectedIndex;
         }
 
         private void InitDB()
@@ -61,6 +72,25 @@ namespace WpfSqlAny
             ChangeStatusField(ConnectionStatusType.Disconnected);
 
             _adapter.StatusChanged += ChangeStatusField;
+        }
+
+        private void Connect_Click(object sender, RoutedEventArgs e)
+        {
+            var createOrOpenWindow = new CreateOrOpenDbWindow(_selectedDatabaseType);
+            createOrOpenWindow.ShowDialog();
+
+            //InitDB();
+
+
+
+            //if (_adapter == null)
+            //{
+            //    App.ErrorMessage("Not exist adapter instance");
+            //    return;
+            //}
+            //_adapter.ConnectToDB();
+
+            RefreshCatalogsFromDB(_adapter.GetTablesNames());
         }
 
         private void RefreshCatalogsFromDB(DataTable dt)
@@ -197,18 +227,6 @@ namespace WpfSqlAny
             RefreshCatalogsFromDB(_adapter.GetTablesNames());
         }
 
-        private void Connect_Click(object sender, RoutedEventArgs e)
-        {
-            if (_adapter == null)
-            {
-                App.ErrorMessage("Not exist adapter instance");
-                return;
-            }
-            _adapter.ConnectToDB();
-
-            RefreshCatalogsFromDB(_adapter.GetTablesNames());
-        }
-
         private bool CheckConnectionErrors()
         {
             if (_adapter == null)
@@ -224,9 +242,16 @@ namespace WpfSqlAny
             return true;
         }
 
-        private void OnDeleteTable_Click(object sender, RoutedEventArgs e)
+        #region IDisposable
+        public void Dispose()
         {
+            (this.toolBarGrid.Children[1] as Button).Click -= Connect_Click;
+            (this.toolBarGrid.Children[2] as Button).Click -= CreateTable_Click;
 
+            tabl.MouseDoubleClick -= CatalogsRow_MouseDoubleClick;
+
+            DataBaseTypeComboBox.DataContextChanged -= DataBaseTypeComboBox_DataContextChanged; ;
         }
+        #endregion
     }
 }
