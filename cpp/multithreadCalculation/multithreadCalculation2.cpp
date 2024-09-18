@@ -9,59 +9,109 @@
 // заново подключать не нужно
 
 
-template<typename It, typename Func1, typename Func2>
-auto map_reduceForOneThread(It p, It q, Func1 f1, Func2 f2) -> decltype(f2(f1(*p), f1(*p)))
+template<typename T, typename It, typename Func1, typename Func2>
+void map_reduceForOneThread(std::vector<T> & results, It p, It q, Func1 f1, Func2 f2)
 {
+    using result2_type = decltype(f2(f1(*p), f1(*p)));
     auto res = f1(*p);
     while (++p != q)
         res = f2(res, f1(*p));
-    
-    return res;
+
+    results.push_back(std::move(res));
 }
 
 // реализация функции mapreduce
 template<typename It, typename Func1, typename Func2>
 auto map_reduce(It p, It q, Func1 f1, Func2 f2, size_t thCount) -> decltype(f2(f1(*p), f1(*p)))
 {
-   using result2_type = decltype(f2(f1(*p), f1(*p)));
+    using result2_type = decltype(f2(f1(*p), f1(*p)));
 
-   auto n = 0;
-   for (auto i = p; i != q; ++i)
-   {
-       ++n;
-   }
+    auto n = 0;
+    for (auto i = p; i != q; ++i)
+    {
+        ++n;
+    }
 
-   auto loadForThread = n / thCount;
-   auto mod = n % thCount;
+    auto loadForThread = n / thCount;
+    auto mod = n % thCount;
 
-   std::vector<std::future<result2_type>> v;
-   bool flg = false;
-   auto startP = p;
-   for (auto i = 0; i < thCount; ++i)
-   {
-       auto curLast = startP;
-       if (i + 1 < thCount)
-       {
-           for (auto j = 0; j < loadForThread; ++j)
-           {
-               ++curLast;
-           }
-       }
-       else
-       {
-           curLast = q;
-       }
-       auto funcForOneThread = [startP, curLast, &f1, &f2]() { return map_reduceForOneThread(startP, curLast, f1, f2); };
-       v.push_back(std::async(std::launch::async, funcForOneThread));
-       startP = curLast;
-   }
-   auto res = v[0].get();
-   for (auto i = 1; i < v.size(); ++i)
-   {
-       res = f2(res, v[i].get());
-   }
-   return res;
+    std::vector<std::thread> calculatingThreads;
+    std::vector<result2_type> results;// (thCount);
+    bool flg = false;
+    auto startP = p;
+    for (auto i = 0; i < thCount; ++i)
+    {
+        auto curLast = startP;
+        if (i + 1 < thCount)
+        {
+            for (auto j = 0; j < loadForThread; ++j)
+            {
+                ++curLast;
+            }
+        }
+        else
+        {
+            curLast = q;
+        }
+         
+        std::thread t([&results, startP, curLast, f1, f2]() { map_reduceForOneThread<result2_type>(results, startP, curLast, f1, f2); });
+
+        calculatingThreads.push_back(std::move(t));
+        startP = curLast;
+
+    }
+    calculatingThreads[0].join();
+    auto res = results[0];
+    for (auto i = 1; i < calculatingThreads.size(); ++i)
+    {
+        calculatingThreads[i].join();
+        res = f2(res, results[i]);
+    }
+    return res;
 }
+
+//template<typename It, typename Func1, typename Func2>
+//auto map_reduce(It p, It q, Func1 f1, Func2 f2, size_t thCount) -> decltype(f2(f1(*p), f1(*p)))
+//{
+//    using result2_type = decltype(f2(f1(*p), f1(*p)));
+//
+//    auto n = 0;
+//    for (auto i = p; i != q; ++i)
+//    {
+//        ++n;
+//    }
+//
+//    auto loadForThread = n / thCount;
+//    auto mod = n % thCount;
+//
+//    std::vector<std::future<result2_type>> v;
+//    bool flg = false;
+//    auto startP = p;
+//    for (auto i = 0; i < thCount; ++i)
+//    {
+//        auto curLast = startP;
+//        if (i + 1 < thCount)
+//        {
+//            for (auto j = 0; j < loadForThread; ++j)
+//            {
+//                ++curLast;
+//            }
+//        }
+//        else
+//        {
+//            curLast = q;
+//        }
+//        auto funcForOneThread = [startP, curLast, &f1, &f2]() { return map_reduceForOneThread(startP, curLast, f1, f2); };
+//        v.push_back(std::async(std::launch::async, funcForOneThread));
+//        startP = curLast;
+//    }
+//    auto res = v[0].get();
+//    for (auto i = 1; i < v.size(); ++i)
+//    {
+//        res = f2(res, v[i].get());
+//    }
+//    return res;
+//}
 
 int main()
 {
