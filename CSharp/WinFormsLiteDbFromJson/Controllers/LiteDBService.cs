@@ -64,7 +64,7 @@ namespace WinFormsLiteDbFromJson.Controllers
                 {
                     var property = item.GetType().GetProperty(propertyName);
                     var value = property.GetValue(item, null);
-                    if (filterOperation.CheckFilter((String)value))
+                    if (value != null && filterOperation.CheckFilter(value.ToString()))
                         result.Add(item);
                 }
                 return result;
