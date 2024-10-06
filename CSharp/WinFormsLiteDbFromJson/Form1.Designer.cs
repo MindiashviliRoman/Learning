@@ -54,13 +54,13 @@
             checkBox1 = new CheckBox();
             openFileDialog1 = new OpenFileDialog();
             label2 = new Label();
-            tableLayoutPanel1.SuspendLayout();
-            panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
-            panel1.SuspendLayout();
-            FilteringGB.SuspendLayout();
-            groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            tableLayoutPanel1.SuspendLayout();
+            panel1.SuspendLayout();
+            panel2.SuspendLayout();
+            groupBox1.SuspendLayout();
+            FilteringGB.SuspendLayout();
             SuspendLayout();
             // 
             // tableLayoutPanel1
